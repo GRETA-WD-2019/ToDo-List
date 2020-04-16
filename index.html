@@ -14,6 +14,7 @@
             var elementDeplace=null;
 
             var randomColor=function(){
+                // générateur de couleurs RGB ( Au moins une couleur > 200 pour augmenter les chnace qeu le noir soit lisible dessus);
                 let rouge,vert,bleu;
                 do{
                     rouge=Math.round(Math.random() * 255);
@@ -27,35 +28,59 @@
 
             var addToDo=function(){
 
+                // ajout d'un Post-It
+                
+                //création d'un nouveau li ( post-it)
                 let newToDo=document.createElement("li");
+
+                
+                /*-----------------
+                /!\ Attention : un Element avec le contentEditable ne peut pas être draggable.
+
+                    Pour cette raison on est obliger de ruser et de ne le rendre éditable que onMouseUp.
+                    Enfin on retire le contenteditable onBlur ( quand le post-it perd le focus).
+                ----------------------*/
+
                 newToDo.addEventListener("mouseup",
                     function(e){
                         e.currentTarget.contentEditable="True";
                         e.currentTarget.focus();
                     }
                 );
+
+
+
+                //onBlur on supprimme le post-it si il est vide on met contentEditable="False"
                 newToDo.addEventListener("blur",
                     function(e){
-                        console.log(e.currentTarget.innerHTML);
-                            if (e.currentTarget.innerHTML==""){
+                        console.log(e.currentTarget.innerText.trim().length);
+                            if (e.currentTarget.innerText.trim().length==0){
                                 e.currentTarget.parentNode.removeChild(e.currentTarget);
-                            }   
+                            }
                         e.currentTarget.contentEditable="False";
                     }
                 );
                 
+                 //----------------
+
+
+                // Post-it Draggable
                 newToDo.draggable="True";
-                
+               
                 newToDo.addEventListener('dragstart', function(e) {
+                    // on commence le Drag on enregistre l'objet qeu l'on déplace dans la variable elementDeplace
                     elementDeplace = e.currentTarget; 
                     console.log("dragstart");
-                    e.dataTransfer.setData('text/plain', ''); // Nécessaire pour Firefox
+                   // e.dataTransfer.setData('text/plain', ''); // Nécessaire (conseillé) pour Firefox
                 });
                 
                 console.log(randomColor());
                 newToDo.style.backgroundColor=randomColor();
+                
+                //on ajoute le li dans le UL
                 document.querySelector("#toDo>ul").appendChild(newToDo);
                 
+                //on donne le Focus à notre post-it
                 newToDo.focus();
 
                 
@@ -63,12 +88,14 @@
             }
 
             var dropHandler=function(e){
+                //quand on lache l'élément elementDeplace on le deplace dans l'élément au dessus duquel on l'a lâché.
                 e.preventDefault();
                 console.log("drop");
                 e.currentTarget.querySelector("ul").appendChild(elementDeplace);
             }
 
             var deleteHandler=function(e){
+                //laché au dessu de la poubelle on supprime l'élément
                 e.preventDefault();
                 console.log("drop");
                 if (! confirm("Etes vous sur de vouloir jeter ce post-it?")){
@@ -78,19 +105,32 @@
             }
 
             var sauvegarde=function(){
-                localStorage.setItem("contenu", document.querySelector("main").innerHTML);
-                //localStorage.setItem("contenu","");
+
+                //Hors sujet on sauvegarde le contenu de nos 2 zones dans le navigateur avec l'API localStorage ( )
+
+                localStorage.setItem("contenuToDo", document.querySelector("main #toDo ul").innerHTML);
+                localStorage.setItem("contenuDone", document.querySelector("main #Done ul").innerHTML);
+               
                 alert("la page a été sauvegardée");
             }
 
             var restauration=function(){
-                let contenu=localStorage.getItem("contenu");
-                if (!contenu){
+
+                // Au chargement de la page on récupère ce qui est sauvegardé dans localstorage
+
+                let contenuToDo=localStorage.getItem("contenuToDo");
+                let contenuDone=localStorage.getItem("contenuDone");
+                if (! ( contenuToDo || contenuDone) ){
                     return;
                 }
 
-                document.querySelector("main").innerHTML=contenu;
+                document.querySelector("main #toDo ul").innerHTML=contenuToDo;
+                document.querySelector("main #Done ul").innerHTML=contenuDone;
 
+                
+
+
+                // On rajoute les focntionnalités de chaqeu post-it.
                 let postits=document.querySelectorAll("main>section>ul>li");
 
                 for (let i=0;i<postits.length;i++){
@@ -104,8 +144,8 @@
                     );
                     postits[i].addEventListener("blur",
                         function(e){
-                            console.log(e.currentTarget.innerHTML);
-                            if (e.currentTarget.innerHTML==""){
+                            console.log(e.currentTarget.innerText.trim().length);
+                            if (e.currentTarget.innerText.trim().length==0){
                                 e.currentTarget.parentNode.removeChild(e.currentTarget);
                             }
                             e.currentTarget.contentEditable="False";
