@@ -1,0 +1,75 @@
+<html>
+
+    <head>
+        <meta charset="utf-8">
+        <meta name="viewport" content="width=device-width, user-scalable=no">
+        <title>To Do</title>
+        <link rel="stylesheet" type="text/css" href="theme/main.css">
+
+
+        <script>
+
+           
+            var randomColor=function(){
+                let rouge,vert,bleu;
+                do{
+                    rouge=Math.round(Math.random() * 255);
+                    vert=Math.round(Math.random() * 255);
+                    bleu=Math.round(Math.random() * 255);
+                }while(rouge < 200 && vert < 200 && bleu < 200)
+                
+                return "rgba("+rouge+","+vert+","+bleu+")";
+            }
+
+
+            var addToDo=function(){
+
+                let newToDo=document.createElement("li");
+                newToDo.contentEditable="True";
+                console.log(randomColor());
+                newToDo.style.backgroundColor=randomColor();
+                document.querySelector("#toDo>ul").appendChild(newToDo);
+                
+                newToDo.focus();       
+
+            }
+
+
+            var init=function(){
+                
+                document.getElementById("ajouterBtn").addEventListener("click",addToDo);
+                
+            }
+
+
+            window.addEventListener("DOMContentLoaded",init);
+
+           
+
+        </script>
+
+
+    </head>
+
+    <body>
+        <header>
+            <h1>ToDo List</h1>
+        </header>
+        <main> 
+            <section id="toDo">
+                <h2>À faire</h2>
+                <button id="ajouterBtn" class="material-icons">add_circle_outline</button>
+                <ul></ul>
+            </section>
+            <section id="Done">
+                <h2>Fait</h2>
+                <ul></ul>
+            </div>
+        </main>
+        <span id='poubelle' class="material-icons">delete</span>
+        <footer>
+            &copy; moi 2020
+        </footer>
+
+    </body>
+</html>
