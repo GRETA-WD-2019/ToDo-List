@@ -1,0 +1,97 @@
+    <!doctype html>
+    <html>
+
+        <head>
+            <meta charset="utf-8">
+            <meta name="viewport" content="width=device-width, user-scalable=no">
+            <title>To Do</title>
+            
+        <style>
+            *{
+                margin:0;
+                padding:0;
+            }
+            body{
+                min-height:100vh;   
+                display:flex;
+                align-items: stretch;
+                justify-content: center;
+            }
+
+            body>section{
+                width:50%;
+                border:2px;
+                margin: 1em;
+                display:flex;
+                align-items: center;
+                justify-content: center;
+
+            }
+
+            body>section:nth-of-type(odd){
+                background-color:lightblue;
+            }
+
+
+            body>section:nth-of-type(even){
+                background-color:lightcoral;
+            }
+
+            #cercle{
+                    width:30vmin;
+                    height:30vmin;
+                    border-radius:50%;
+                    background-color:yellowgreen;
+            }
+
+
+            </style>
+
+
+
+            <script>
+
+                var dragElt=null;
+
+                var OnDragStartHandler=function(e){
+                    console.log("startdrag");
+                    //on récupère l'élément que l'on déplace et on le stock ddans une variable dragElt
+                    dragElt=e.currentTarget;
+                   
+
+                }
+                var dropHandler=function(e){
+  					e.preventDefault
+                    console.log("drop");
+                    e.currentTarget.appendChild(dragElt);
+                }
+
+
+                var init=function(){
+
+                    document.getElementById("cercle").addEventListener("dragstart",OnDragStartHandler);
+                    document.getElementById("sectionDroite").addEventListener("drop",dropHandler);
+                    document.getElementById("sectionDroite").addEventListener("dragover",function(e){
+                        e.preventDefault();
+                    });
+
+                }
+
+
+                window.addEventListener("DOMContentLoaded",init);
+
+            </script>
+
+
+        </head>
+
+        <body>
+            
+            <section id="sectionGauche">
+                    <div id="cercle" draggable="true"></div>
+            </section>
+            
+            <section id="sectionDroite"></section>
+            
+        </body>
+    </html>
