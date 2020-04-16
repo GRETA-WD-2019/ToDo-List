@@ -1,0 +1,177 @@
+<html>
+
+    <head>
+        <meta charset="utf-8">
+        <meta name="viewport" content="width=device-width, user-scalable=no">
+        <title>To Do</title>
+        <link rel="stylesheet" type="text/css" href="theme/main.css">
+
+
+        <script>
+
+            var elementDeplace=null;
+
+            var randomColor=function(){
+                let rouge,vert,bleu;
+                do{
+                    rouge=Math.round(Math.random() * 255);
+                    vert=Math.round(Math.random() * 255);
+                    bleu=Math.round(Math.random() * 255);
+                }while(rouge < 200 && vert < 200 && bleu < 200)
+                
+                return "rgba("+rouge+","+vert+","+bleu+")";
+            }
+
+
+            var addToDo=function(){
+
+                let newToDo=document.createElement("li");
+                newToDo.addEventListener("mouseup",
+                    function(e){
+                        e.currentTarget.contentEditable="True";
+                        e.currentTarget.focus();
+                    }
+                );
+                newToDo.addEventListener("blur",
+                    function(e){
+                        console.log(e.currentTarget.innerHTML);
+                            if (e.currentTarget.innerHTML==""){
+                                e.currentTarget.parentNode.removeChild(e.currentTarget);
+                            }   
+                        e.currentTarget.contentEditable="False";
+                    }
+                );
+                
+                newToDo.draggable="True";
+                
+                newToDo.addEventListener('dragstart', function(e) {
+                    elementDeplace = e.currentTarget; 
+                    console.log("dragstart");
+                    e.dataTransfer.setData('text/plain', ''); // Nécessaire pour Firefox
+                });
+                
+                console.log(randomColor());
+                newToDo.style.backgroundColor=randomColor();
+                document.querySelector("#toDo>ul").appendChild(newToDo);
+                
+                newToDo.focus();
+
+                
+
+            }
+
+            var dropHandler=function(e){
+                e.preventDefault();
+                console.log("drop");
+                e.currentTarget.querySelector("ul").appendChild(elementDeplace);
+            }
+
+            var deleteHandler=function(e){
+                e.preventDefault();
+                console.log("drop");
+                if (! confirm("Etes vous sur de vouloir jeter ce post-it?")){
+                    return;
+                }
+                elementDeplace.parentNode.removeChild(elementDeplace);
+            }
+
+            var sauvegarde=function(){
+                localStorage.setItem("contenu", document.querySelector("main").innerHTML);
+                //localStorage.setItem("contenu","");
+                alert("la page a été sauvegardée");
+            }
+
+            var restauration=function(){
+                let contenu=localStorage.getItem("contenu");
+                if (!contenu){
+                    return;
+                }
+
+                document.querySelector("main").innerHTML=contenu;
+
+                let postits=document.querySelectorAll("main>section>ul>li");
+
+                for (let i=0;i<postits.length;i++){
+
+                    postits[i].addEventListener("mouseup",
+                        function(e){
+                            e.preventDefault();
+                            e.currentTarget.contentEditable="True";
+                            e.currentTarget.focus();
+                        }
+                    );
+                    postits[i].addEventListener("blur",
+                        function(e){
+                            console.log(e.currentTarget.innerHTML);
+                            if (e.currentTarget.innerHTML==""){
+                                e.currentTarget.parentNode.removeChild(e.currentTarget);
+                            }
+                            e.currentTarget.contentEditable="False";
+                        }
+                    );
+
+                    postits[i].addEventListener('dragstart', function(e) {
+                        elementDeplace = e.currentTarget; 
+                        console.log("dragstart");
+                        e.dataTransfer.setData('text/plain', ''); // Nécessaire pour Firefox
+                    });
+
+                }
+
+            }
+
+
+            var init=function(){
+                restauration();
+                document.getElementById("ajouterBtn").addEventListener("click",addToDo);
+                document.getElementById("Done").addEventListener("dragover",function(e){
+                        e.preventDefault();
+                });
+                document.getElementById("Done").addEventListener("drop",dropHandler);
+
+                document.getElementById("toDo").addEventListener("dragover",function(e){
+                        e.preventDefault();
+                });
+                document.getElementById("toDo").addEventListener("drop",dropHandler);
+
+                document.getElementById("poubelle").addEventListener("dragover",function(e){
+                        e.preventDefault();
+                });
+
+                document.getElementById("poubelle").addEventListener("drop",deleteHandler);
+
+                console.log(document.getElementById("Done"));
+            }
+
+
+            window.addEventListener("DOMContentLoaded",init);
+
+            window.addEventListener("beforeunload",sauvegarde);
+
+        </script>
+
+
+    </head>
+
+    <body>
+        <header>
+            <h1>ToDo List</h1>
+        </header>
+        <main> 
+            <section id="toDo">
+                <h2>À faire</h2>
+                <button id="ajouterBtn" class="material-icons">add_circle_outline</button>
+                <ul></ul>
+            </section>
+            <section id="Done">
+                <h2>Fait</h2>
+                <ul></ul>
+            </div>
+        </main>
+        <span id='poubelle' class="material-icons">delete</span>
+        <footer>
+            &copy; moi 2020
+        </footer>
+
+    </body>
+</html>
